@@ -1,21 +1,26 @@
-use yew::prelude::*;
+mod components;
+use std::vec;
+use yew::{prelude::*, Html};
 
 #[function_component]
 fn App() -> Html {
-    let counter = use_state(|| 0);
-    let onclick = {
-        let counter = counter.clone();
-        move |_| {
-            let value = *counter + 1;
-            counter.set(value);
-        }
-    };
-
+    let temp = vec!["take out the doge", "smell the flowers", "study"];
+    let todo_items = use_state_eq(|| temp);
     html! {
-        <div>
-            <button {onclick}>{ "+1" }</button>
-            <p>{ *counter }</p>
-        </div>
+        // container
+        <section>
+            // input
+            <input />
+            <hr/>
+            // todo items
+            <ul>
+                {
+                    todo_items.into_iter().map(|item| {
+                        html!{<TodoItem key={item} todo={item} />}
+                    }).collect()::<Html>()
+                }
+            </ul>
+        </section>
     }
 }
 

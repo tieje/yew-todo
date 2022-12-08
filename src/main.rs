@@ -1,4 +1,5 @@
 mod components;
+use crate::components::todo_item::TodoItem;
 use std::vec;
 use yew::{prelude::*, Html};
 
@@ -15,9 +16,9 @@ fn App() -> Html {
             // todo items
             <ul>
                 {
-                    todo_items.into_iter().map(|item| {
+                    (*todo_items).clone().into_iter().map(|item| {
                         html!{<TodoItem key={item} todo={item} />}
-                    }).collect()::<Html>()
+                    }).collect::<Html>()
                 }
             </ul>
         </section>

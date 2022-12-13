@@ -3,14 +3,14 @@ use yew::{prelude::*};
 #[derive(PartialEq, Properties)]
 pub struct TodoItemProps {
     pub todo: String,
-    pub onclick: Callback<Vec<&str>>
+    pub onclick: Callback<MouseEvent>
 }
 
 #[function_component(TodoItem)]
 pub fn todo_item(props: &TodoItemProps) -> Html {
     html! {
         <li>
-            <button onclick={props.onclick}>
+            <button onclick={props.onclick.clone()}>
                 {props.todo.clone()}
             </button>
         </li>

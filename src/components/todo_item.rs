@@ -1,17 +1,18 @@
-use yew::{prelude::*};
+use yew::{prelude::*, html::onclick::Event};
 
 #[derive(PartialEq, Properties)]
 pub struct TodoItemProps {
     pub todo: String,
-    pub onclick: Callback<MouseEvent>
+    pub onclick: Callback<Event>
 }
 
 #[function_component(TodoItem)]
 pub fn todo_item(props: &TodoItemProps) -> Html {
+    let onclick = props.onclick.clone();
     html! {
         <li>
-            <button onclick={props.onclick.clone()}>
-                {props.todo.clone()}
+            <button onclick={move |e: Event| onclick.emit(e)}>
+                {props.todo}
             </button>
         </li>
     }

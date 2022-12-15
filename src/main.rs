@@ -1,9 +1,24 @@
 mod components;
+mod hooks;
 use crate::components::{todo_input::TodoInput, todo_item::TodoItem};
+use crate::hooks::utils::delete_todo_v4;
 use std::vec;
 use web_sys::{console, HtmlElement};
-use yew::{html::onclick::Event, prelude::*, Html};
+use yew::{prelude::*, Html};
 
+fn delete_todo_v2(state: UseStateHandle<Vec<&str>>, e: MouseEvent) {
+    if let Some(target) = e.target_dyn_into::<HtmlElement>() {
+        let value = target.inner_text();
+        console::log_1(&format!("{:?}", value).into());
+        let mut current_todos = state.clone().to_vec();
+        current_todos.retain(|&x| x != value);
+        state.set(current_todos);
+    }
+}
+
+fn delete_todo_v3(state: UseStateHandle<Vec<&str>>, e: MouseEvent) -> () {
+    delete_todo_v2(state.clone(), e)
+}
 
 #[function_component]
 fn App() -> Html {
@@ -21,20 +36,12 @@ fn App() -> Html {
             }
         })
     };
-    fn delete_todo_v2(e: MouseEvent) {
-        if let Some(target) = e.target_dyn_into::<HtmlElement>() {
-            let value = target.inner_text();
-            console::log_1(&format!("{:?}", value).into());
-            let mut current_todos = || todo_items.clone().to_vec();
-            current_todos.retain(|&x| x != value);
-            todo_items.set(current_todos);
-        }
-    }
-    
-    let delete_todo_v2: Callback<Event> = {
-        Callback::from(delete_todo_v2)
-    };
 
+    // Abstracting delete_todo_v1 further
+    let delete_todo_v2: Callback<MouseEvent> = {
+        let todo_items = todo_items.clone();
+        Callback::from(move |e: MouseEvent| delete_todo_v2(todo_items.clone(), e))
+    };
     html! {
         // container
         <section>
@@ -45,7 +52,32 @@ fn App() -> Html {
             <ul>
                 {
                     (*todo_items).clone().into_iter().map(|item| {
+                        html!{<TodoItem onclick={delete_todo_v1.clone()} key={item} todo={item} />}
+                    }).collect::<Html>()
+                }
+            </ul>
+            <ul>
+                {
+                    (*todo_items).clone().into_iter().map(|item| {
                         html!{<TodoItem onclick={delete_todo_v2.clone()} key={item} todo={item} />}
+                    }).collect::<Html>()
+                }
+            </ul>
+            // Abstracting delete_todo_v2 further
+            <ul>
+                {
+                    (*todo_items).clone().into_iter().map(|item| {
+                        let todo_items = todo_items.clone();
+                        html!{<TodoItem onclick={move |e: MouseEvent| delete_todo_v3(todo_items.clone(), e)} key={item} todo={item} />}
+                    }).collect::<Html>()
+                }
+            </ul>
+            // Import delete_todo_v4 from a mod, which combines v3 and v2
+            <ul>
+                {
+                    (*todo_items).clone().into_iter().map(|item| {
+                        let todo_items = todo_items.clone();
+                        html!{<TodoItem onclick={move |e: MouseEvent| delete_todo_v4(todo_items.clone(), e)} key={item} todo={item} />}
                     }).collect::<Html>()
                 }
             </ul>
